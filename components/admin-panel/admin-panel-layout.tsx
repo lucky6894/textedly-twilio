@@ -5,8 +5,9 @@ import { useStore } from "@/hooks/use-store";
 import { Footer } from "@/components/admin-panel/footer";
 import { Sidebar } from "@/components/admin-panel/sidebar";
 import { useSidebarToggle } from "@/hooks/use-sidebar-toggle";
+import { ContentLayout } from "./content-layout";
 
-export default function AdminPanelLayout({
+export default function RootLayout({
   children
 }: {
   children: React.ReactNode;
@@ -24,7 +25,9 @@ export default function AdminPanelLayout({
           sidebar?.isOpen === false ? "lg:ml-[90px]" : "lg:ml-72"
         )}
       >
-        {children}
+        <ContentLayout title="">
+          {children}
+        </ContentLayout>
       </main>
       <footer
         className={cn(
@@ -32,7 +35,7 @@ export default function AdminPanelLayout({
           sidebar?.isOpen === false ? "lg:ml-[90px]" : "lg:ml-72"
         )}
       >
-        <Footer />
+        {/* <Footer /> */}
       </footer>
     </>
   );

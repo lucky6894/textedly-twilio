@@ -1,126 +1,162 @@
-import Link from "next/link";
-import Image from "next/image";
-import { PanelsTopLeft } from "lucide-react";
-import { ArrowRightIcon, GitHubLogoIcon } from "@radix-ui/react-icons";
+"use client"
 
 import { Button } from "@/components/ui/button";
-import { ModeToggle } from "@/components/mode-toggle";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu";
+import { DropdownMenuItem } from "@radix-ui/react-dropdown-menu";
+import { ChevronDown, ImageIcon, ImagePlayIcon, LaughIcon, Paperclip } from "lucide-react";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { Calendar } from "@/components/ui/calendar";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useState } from "react";
+import { cn } from "@/lib/utils";
 
 export default function HomePage() {
+  const [time, setTime] = useState(true);
+  const [calendarOpen, setCalendarOpen] = useState(false);
+
   return (
-    <div className="flex flex-col min-h-screen">
-      <header className="z-[50] sticky top-0 w-full bg-background/95 border-b backdrop-blur-sm dark:bg-black/[0.6] border-border/40">
-        <div className="container h-14 flex items-center">
-          <Link
-            href="/"
-            className="flex justify-start items-center hover:opacity-85 transition-opacity duration-300"
-          >
-            <PanelsTopLeft className="w-6 h-6 mr-3" />
-            <span className="font-bold">shadcn/ui sidebar</span>
-            <span className="sr-only">shadcn/ui sidebar</span>
-          </Link>
-          <nav className="ml-auto flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="icon"
-              className="rounded-full w-8 h-8 bg-background"
-              asChild
-            >
-              <Link href="https://github.com/salimi-my/shadcn-ui-sidebar">
-                <GitHubLogoIcon className="h-[1.2rem] w-[1.2rem]" />
-              </Link>
-            </Button>
-            <ModeToggle />
-          </nav>
+    <div>
+      <div>
+        <p className="text-sm text-gray-500 mb-2">Your Message</p>
+        <textarea className="rounded-md w-full min-h-32 border-2 p-3"></textarea>
+        <div className="flex justify-between items-center">
+          <p className="text-gray-500 text-sm">
+            Characters: <span className="font-semibold">128</span>
+            &nbsp;&nbsp;|&nbsp;&nbsp;
+            <span className="font-semibold">1</span> message
+          </p>
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="link" className="p-0 h-4">
+                Templates
+                <ChevronDown size={14} />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent>
+              <DropdownMenuItem>Status Bar</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
-      </header>
-      <main className="min-h-[calc(100vh-57px-97px)] flex-1">
-        <div className="container relative pb-10">
-          <section className="mx-auto flex max-w-[980px] flex-col items-center gap-2 py-8 md:py-12 md:pb-8 lg:py-24 lg:pb-6">
-            <h1 className="text-center text-3xl font-bold leading-tight tracking-tighter md:text-5xl lg:leading-[1.1]">
-              Sidebar example built on top of shadcn/ui
-            </h1>
-            <span className="max-w-[750px] text-center text-lg font-light text-foreground">
-              A stunning and functional retractable sidebar for Next.js using
-              shadcn/ui complete with desktop and mobile responsiveness.
-            </span>
-            <div className="flex w-full items-center justify-center space-x-4 py-4 md:pb-6">
-              <Button variant="default" asChild>
-                <Link href="/dashboard">
-                  Demo
-                  <ArrowRightIcon className="ml-2" />
-                </Link>
-              </Button>
-              <Button variant="outline" asChild>
-                <Link
-                  href="https://ui.shadcn.com/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  Learn shadcn/ui
-                </Link>
-              </Button>
-            </div>
-          </section>
-          <div className="w-full flex justify-center relative">
-            <Image
-              src="/demo-light-min.png"
-              width={1080}
-              height={608}
-              alt="demo"
-              priority
-              className="border rounded-xl shadow-sm dark:hidden"
-            />
-            <Image
-              src="/demo-dark-min.png"
-              width={1080}
-              height={608}
-              alt="demo-dark"
-              priority
-              className="border border-zinc-600 rounded-xl shadow-sm hidden dark:block dark:shadow-gray-500/5"
-            />
-            <Image
-              src="/demo-mobile-light-min.png"
-              width={228}
-              height={494}
-              alt="demo-mobile"
-              className="border rounded-xl absolute bottom-0 right-0 hidden lg:block dark:hidden"
-            />
-            <Image
-              src="/demo-mobile-dark-min.png"
-              width={228}
-              height={494}
-              alt="demo-mobile"
-              className="border border-zinc-600 rounded-xl absolute bottom-0 right-0 hidden dark:lg:block"
-            />
+      </div>
+      <div className="mt-5">
+        <Button className="h-4 text-blue-500 px-2" variant="link">
+          <LaughIcon size={16} className="mr-1" />
+          Emojis
+        </Button>
+        <Button className="h-4 text-blue-500 px-2" variant="link">
+          <ImageIcon size={16} className="mr-1" />
+          Photo
+        </Button>
+        <Button className="h-4 text-blue-500 px-2" variant="link">
+          <Paperclip size={16} className="mr-1" />
+          File
+        </Button>
+        <Button className="h-4 text-blue-500 px-2" variant="link">
+          <ImagePlayIcon size={16} className="mr-1" />
+          GIF
+        </Button>
+      </div>
+      <div className="mt-20">
+        <p className="font-bold mb-10">Choose When to Send</p>
+        <div className="flex mb-5 gap-5">
+          <div
+            className={cn(
+              "w-1/2 border-2 rounded-lg py-2 px-4 cursor-pointer transition-all",
+              time ? "border-teal-400 bg-teal-100" : ""
+            )}
+            onClick={() => setTime(true)}
+          >
+            <input className="accent-teal-700" type="radio" name="when" checked={time} /> Now
+          </div>
+          <div
+            className={cn(
+              "w-1/2 border-2 rounded-lg py-2 px-4 cursor-pointer transition-all",
+              !time ? "border-teal-400 bg-teal-100" : ""
+            )}
+            onClick={() => setTime(false)}
+          >
+            <input className="accent-teal-700" type="radio" name="when" checked={!time} /> Later
           </div>
         </div>
-      </main>
-      <footer className="py-6 md:py-0 border-t border-border/40">
-        <div className="container flex flex-col items-center justify-center gap-4 md:h-24 md:flex-row">
-          <p className="text-balance text-center text-sm leading-loose text-muted-foreground">
-            Built on top of{" "}
-            <Link
-              href="https://ui.shadcn.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-medium underline underline-offset-4"
-            >
-              shadcn/ui
-            </Link>
-            . The source code is available on{" "}
-            <Link
-              href="https://github.com/salimi-my/shadcn-ui-sidebar"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-medium underline underline-offset-4"
-            >
-              GitHub
-            </Link>
-            .
-          </p>
+        <div className="flex gap-5 w-full">
+          <div className="w-1/2">
+            <p className="text-gray-500">Choose date and time</p>
+            <HoverCard open={calendarOpen}>
+              <HoverCardTrigger>
+                <input
+                  className="border-2 rounded-md h-10 w-full pl-3"
+                  type="text"
+                  onClick={() => setCalendarOpen(true)}
+                  onBlur={() => setCalendarOpen(false)}
+                />
+              </HoverCardTrigger>
+              <HoverCardContent className="w-full p-1">
+                <Calendar
+                  mode="single"
+                  className="rounded-md w-full"
+                />
+              </HoverCardContent>
+            </HoverCard>
+          </div>
+          <div className="w-1/2">
+            <p className="text-gray-500">Time</p>
+            <div className="flex gap-2">
+              <Select value="09">
+                <SelectTrigger className="w-full h-10">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    {Array.from({ length: 12 }, (_, i) => (i + 1).toString().padStart(2, "0")).map(item => (
+                      <SelectItem key={item} value={item}>{item}</SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+              <Select value="00">
+                <SelectTrigger className="w-full h-10">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                  {Array.from({ length: 12 }, (_, i) => i.toString().padStart(2, "0")).map(item => (
+                      <SelectItem key={item} value={item}>{item}</SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+              <Select value="AM">
+                <SelectTrigger className="w-full h-10">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectItem value="AM">AM</SelectItem>
+                    <SelectItem value="PM">PM</SelectItem>
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
         </div>
-      </footer>
+      </div>
     </div>
   );
 }

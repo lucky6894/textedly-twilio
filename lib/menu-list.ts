@@ -1,11 +1,16 @@
 import {
-  Tag,
-  Users,
-  Settings,
-  Bookmark,
-  SquarePen,
+  CannabisIcon,
+  CircleDollarSignIcon,
+  ContactIcon,
+  HashIcon,
+  HouseIcon,
+  InboxIcon,
+  KeyIcon,
   LayoutGrid,
-  LucideIcon
+  LucideIcon,
+  MessageCircleIcon,
+  PhoneCallIcon,
+  Users2Icon
 } from "lucide-react";
 
 type Submenu = {
@@ -33,63 +38,73 @@ export function getMenuList(pathname: string): Group[] {
       groupLabel: "",
       menus: [
         {
-          href: "/dashboard",
+          href: "#",
           label: "Dashboard",
           active: pathname.includes("/dashboard"),
-          icon: LayoutGrid,
+          icon: HouseIcon,
           submenus: []
+        },
+        {
+          href: "#",
+          label: "Inbox",
+          active: false,
+          icon: InboxIcon
+        },
+        {
+          href: "#",
+          label: "Channels",
+          active: false,
+          icon: CannabisIcon
+        },
+        {
+          href: "#",
+          label: "Contacts",
+          active: false,
+          icon: ContactIcon
+        },
+        {
+          href: "#",
+          label: "Messages",
+          active: false,
+          icon: MessageCircleIcon
+        },
+        {
+          href: "#",
+          label: "Keywords",
+          active: false,
+          icon: KeyIcon
+        },
+        {
+          href: "#",
+          label: "Numbers",
+          active: false,
+          icon: HashIcon
+        },
+        {
+          href: "#",
+          label: "Voice Calls",
+          active: false,
+          icon: PhoneCallIcon
+        },
+        {
+          href: "#",
+          label: "Reviews",
+          active: false,
+          icon: Users2Icon
+        },
+        {
+          href: "#",
+          label: "Payments",
+          active: false,
+          icon: CircleDollarSignIcon
+        },
+        {
+          href: "#",
+          label: "App Store",
+          active: false,
+          icon: LayoutGrid
         }
       ]
     },
-    {
-      groupLabel: "Contents",
-      menus: [
-        {
-          href: "",
-          label: "Posts",
-          active: pathname.includes("/posts"),
-          icon: SquarePen,
-          submenus: [
-            {
-              href: "/posts",
-              label: "All Posts"
-            },
-            {
-              href: "/posts/new",
-              label: "New Post"
-            }
-          ]
-        },
-        {
-          href: "/categories",
-          label: "Categories",
-          active: pathname.includes("/categories"),
-          icon: Bookmark
-        },
-        {
-          href: "/tags",
-          label: "Tags",
-          active: pathname.includes("/tags"),
-          icon: Tag
-        }
-      ]
-    },
-    {
-      groupLabel: "Settings",
-      menus: [
-        {
-          href: "/users",
-          label: "Users",
-          active: pathname.includes("/users"),
-          icon: Users
-        },
-        {
-          href: "/account",
-          label: "Account",
-          active: pathname.includes("/account"),
-          icon: Settings
-        }
-      ]
-    }
   ];
 }

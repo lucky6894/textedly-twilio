@@ -15,7 +15,7 @@ export function Navbar({ title }: NavbarProps) {
           <h1 className="font-bold">{title}</h1>
         </div>
         <div className="flex flex-1 items-center justify-end">
-          <ModeToggle />
+          {/* <ModeToggle /> */}
           <UserNav />
         </div>
       </div>
