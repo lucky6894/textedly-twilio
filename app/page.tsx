@@ -23,17 +23,51 @@ import {
 import { cn } from "@/lib/utils";
 import { DropdownMenuItem } from "@radix-ui/react-dropdown-menu";
 import { ChevronDown, ImageIcon, ImagePlayIcon, LaughIcon, Paperclip } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import axios from "axios";
+import { Input } from "@/components/ui/input";
+
+axios.defaults.baseURL = process.env.NEXT_PUBLIC_API;
 
 export default function HomePage() {
   const [time, setTime] = useState(true);
   const [calendarOpen, setCalendarOpen] = useState(false);
+  const [phoneNumbers, setPhoneNumbers] = useState<string[]>([]);
+
+  useEffect(() => {
+    axios.get("/phone-numbers").then(({data}) => {
+      setPhoneNumbers(data);
+    });
+  }, []);
 
   return (
     <div>
+      <div className="mb-10">
+        <p className="font-bold mb-6">Choose What Number to Send From</p>
+        <p className="text-sm text-gray-500 mb-2">Select Phone Number</p>
+        <Select>
+          <SelectTrigger className="w-full h-10">
+            <SelectValue placeholder="Select phone number" />
+          </SelectTrigger>
+          <SelectContent>
+            {phoneNumbers.map(item => (
+              <SelectItem value={item}>{item}</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+      <div className="mb-10">
+        <p className="font-bold mb-6">Choose Who to Send To</p>
+        <p className="text-sm text-gray-500 mb-2">Contacts</p>
+        <Input type="text" defaultValue="+" />
+      </div>
       <div>
+        <p className="font-bold mb-6">Compose Your Message</p>
         <p className="text-sm text-gray-500 mb-2">Your Message</p>
-        <textarea className="rounded-md w-full min-h-32 border-2 p-3"></textarea>
+        <div className="rounded-md w-full border-2 p-0">
+          <div></div>
+          <textarea className="border-2 w-full min-h-16 px-3 py-1"></textarea>
+        </div>
         <div className="flex justify-between items-center">
           <p className="text-gray-500 text-sm">
             Characters: <span className="font-semibold">128</span>
@@ -121,11 +155,9 @@ export default function HomePage() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectGroup>
-                    {Array.from({ length: 12 }, (_, i) => (i + 1).toString().padStart(2, "0")).map(item => (
-                      <SelectItem key={item} value={item}>{item}</SelectItem>
-                    ))}
-                  </SelectGroup>
+                  {Array.from({ length: 12 }, (_, i) => (i + 1).toString().padStart(2, "0")).map(item => (
+                    <SelectItem key={item} value={item}>{item}</SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
               <Select value="00">
@@ -133,11 +165,9 @@ export default function HomePage() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectGroup>
-                  {Array.from({ length: 12 }, (_, i) => i.toString().padStart(2, "0")).map(item => (
-                      <SelectItem key={item} value={item}>{item}</SelectItem>
-                    ))}
-                  </SelectGroup>
+                  {Array.from({ length: 60 }, (_, i) => i.toString().padStart(2, "0")).map(item => (
+                    <SelectItem key={item} value={item}>{item}</SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
               <Select value="AM">
@@ -145,10 +175,8 @@ export default function HomePage() {
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectGroup>
-                    <SelectItem value="AM">AM</SelectItem>
-                    <SelectItem value="PM">PM</SelectItem>
-                  </SelectGroup>
+                  <SelectItem value="AM">AM</SelectItem>
+                  <SelectItem value="PM">PM</SelectItem>
                 </SelectContent>
               </Select>
             </div>
