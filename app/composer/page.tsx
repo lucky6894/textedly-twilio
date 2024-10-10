@@ -31,6 +31,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
 
 const formSchema = z
@@ -64,7 +65,6 @@ export default function ComposeMessage() {
   const [phoneNumbers, setPhoneNumbers] = useState<string[]>([]);
   const [message, setMessage] = useState("");
   const [files, setFiles] = useState<FileList>();
-  const [previewURL, setPreviewURL] = useState<string>();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -78,7 +78,27 @@ export default function ComposeMessage() {
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+    const formData = new FormData();
+    formData.append("from", values.from);
+    formData.append("to", values.to);
+    formData.append("message", values.message);
+    formData.append("when", values.when);
+
+    if (values.when == "later") {
+      //@ts-ignore
+      formData.append("date", values.date);
+      formData.append("time", values.hour + ":" + values.minute + " " + values.noon);
+    }
+
+    const file = values.image ?? values.file;
+    if (file) {
+      formData.append("file", file);
+    }
+
+    axios.post("/send-message", formData)
+      .then(({ data }) => {
+        toast.success("Message sent successfully");
+      });
   }
 
   function onInvalid(error: any) {
@@ -91,15 +111,12 @@ export default function ComposeMessage() {
     });
   }, []);
 
-  useEffect(() => {
+  const messageCount = useMemo(() => Math.ceil(message.length / 160) + 2 * (files?.length || 0), [message, files]);
+  const previewURL = useMemo(() => {
     if (files?.length && files[0].type.startsWith("image/")) {
-      setPreviewURL(URL.createObjectURL(files[0]));
-    } else {
-      setPreviewURL(undefined);
+      return URL.createObjectURL(files[0]);
     }
   }, [files]);
-
-  const messageCount = useMemo(() => Math.ceil(message.length / 160) + 2 * (files?.length || 0), [message, files]);
 
   return (
     <Form {...form}>
@@ -177,6 +194,10 @@ export default function ComposeMessage() {
                   <FormControl>
                     <Textarea className="resize-y !border-none !outline-none !shadow-none min-h-16 w-full px-3 pb-1 pt-0"
                       {...field}
+                      onChange={(event) => {
+                        setMessage(event.target.value);
+                        field.onChange(event);
+                      }}
                     />
                   </FormControl>
                   <FormMessage className="absolute -bottom-5" />
@@ -231,7 +252,11 @@ export default function ComposeMessage() {
                 <FormControl>
                   <Input type="file"
                     className="hidden"
-                    onChange={(event) => field.onChange(event.target.files?.[0] ?? undefined)} />
+                    onChange={(event) => {
+                      field.onChange(event.target.files?.[0] ?? undefined);
+                      setFiles(event.target.files ?? undefined);
+                    }}
+                  />
                 </FormControl>
               </FormItem>
             )}
@@ -248,7 +273,11 @@ export default function ComposeMessage() {
                 <FormControl>
                   <Input type="file"
                     className="hidden"
-                    onChange={(event) => field.onChange(event.target.files?.[0] ?? undefined)} />
+                    onChange={(event) => {
+                      field.onChange(event.target.files?.[0] ?? undefined);
+                      setFiles(event.target.files ?? undefined);
+                    }}
+                  />
                 </FormControl>
               </FormItem>
             )}
