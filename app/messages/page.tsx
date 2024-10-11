@@ -43,8 +43,8 @@ export default function Messages() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {messages?.map((item: any) => (
-            <TableRow>
+          {messages?.map((item: any, index: number) => (
+            <TableRow key={index}>
               <TableCell>{new Date(item.dateSent).toLocaleString()}</TableCell>
               <TableCell>{item.from}</TableCell>
               <TableCell>{item.to}</TableCell>

@@ -96,13 +96,9 @@ export default function ComposeMessage() {
     }
 
     axios.post("/send-message", formData)
-      .then(({ data }) => {
+      .then(() => {
         toast.success("Message sent successfully");
       });
-  }
-
-  function onInvalid(error: any) {
-    console.log(error);
   }
 
   useEffect(() => {
@@ -120,7 +116,7 @@ export default function ComposeMessage() {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit, onInvalid)}>
+      <form onSubmit={form.handleSubmit(onSubmit)}>
         <div className="mb-10">
           <p className="font-bold mb-6">Choose What Number to Send From</p>
           <p className="text-sm text-gray-500 mb-2">Select Phone Number</p>
