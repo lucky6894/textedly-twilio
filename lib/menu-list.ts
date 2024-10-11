@@ -38,9 +38,9 @@ export function getMenuList(pathname: string): Group[] {
       groupLabel: "",
       menus: [
         {
-          href: "#",
+          href: "/",
           label: "Dashboard",
-          active: pathname.includes("/dashboard"),
+          active: pathname == "/",
           icon: HouseIcon,
           submenus: []
         },
