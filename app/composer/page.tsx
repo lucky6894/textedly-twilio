@@ -23,6 +23,7 @@ import axios from "axios";
 import EmojiPicker from 'emoji-picker-react';
 import { ChevronDown, CircleX, ImageIcon, LaughIcon, Paperclip, PaperclipIcon } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
 axios.defaults.baseURL = process.env.NEXT_PUBLIC_API;
@@ -230,7 +231,9 @@ export default function ComposeMessage() {
           You will use <span className="text-black font-semibold">{messageCount}</span> messages
         </p>
         <div className="">
-          <Button className="rounded-full mr-2" variant={"ghost"}>Cancel</Button>
+          <Button className="rounded-full mr-2" variant={"ghost"}>
+            <Link href={"/messages"}>Cancel</Link>
+          </Button>
           <Button className="rounded-full bg-[#6FD0E2]">SEND</Button>
         </div>
       </div>

@@ -63,7 +63,7 @@ export function getMenuList(pathname: string): Group[] {
           icon: ContactIcon
         },
         {
-          href: "#",
+          href: "/messages",
           label: "Messages",
           active: false,
           icon: MessageCircleIcon
