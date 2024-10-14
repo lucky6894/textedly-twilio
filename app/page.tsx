@@ -9,7 +9,7 @@ export default function HomePage() {
   const [statistics, setStatistics] = useState<any>();
 
   useEffect(() => {
-    axios.get("/statistics").then(({data}) => {
+    axios.get("/api/statistics").then(({data}) => {
       setStatistics(data);
     });
   }, []);

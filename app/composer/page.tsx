@@ -1,7 +1,6 @@
 "use client"
 
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,7 +10,6 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
   Select,
   SelectContent,
@@ -20,11 +18,8 @@ import {
   SelectValue
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CalendarIcon } from "@radix-ui/react-icons";
 import axios from "axios";
-import { format } from "date-fns";
 import EmojiPicker from 'emoji-picker-react';
 import { ChevronDown, CircleX, ImageIcon, LaughIcon, Paperclip, PaperclipIcon } from "lucide-react";
 import Image from "next/image";
@@ -61,7 +56,7 @@ const formSchema = z
 axios.defaults.baseURL = process.env.NEXT_PUBLIC_API;
 
 export default function ComposeMessage() {
-  const [time, setTime] = useState<"now" | "later">("now"); // true - now, false - later
+  // const [time, setTime] = useState<"now" | "later">("now"); // true - now, false - later
   const [phoneNumbers, setPhoneNumbers] = useState<string[]>([]);
   const [message, setMessage] = useState("");
   const [files, setFiles] = useState<FileList>();
@@ -90,19 +85,19 @@ export default function ComposeMessage() {
       formData.append("time", values.hour + ":" + values.minute + " " + values.noon);
     }
 
-    const file = values.image ?? values.file;
+    const file = files?.[0];
     if (file) {
       formData.append("file", file);
     }
 
-    axios.post("/send-message", formData)
+    axios.post("/api/send-message", formData)
       .then(() => {
         toast.success("Message sent successfully");
       });
   }
 
   useEffect(() => {
-    axios.get("/phone-numbers").then(({ data }) => {
+    axios.get("/api/phone-numbers").then(({ data }) => {
       setPhoneNumbers(data);
     });
   }, []);
@@ -279,7 +274,7 @@ export default function ComposeMessage() {
             )}
           />
         </div>
-        <div className="mb-20">
+        {/* <div className="mb-20">
           <p className="font-bold mb-10">Choose When to Send</p>
           <FormField
             control={form.control}
@@ -435,7 +430,7 @@ export default function ComposeMessage() {
               </div>
             </div>
           )}
-        </div>
+        </div> */}
         <div className="rounded-2xl border-2 p-5 px-10 flex items-center justify-between bg-gray-100">
           <p className="text-gray-500">
             You will use <span className="text-black font-semibold">{messageCount}</span> messages
