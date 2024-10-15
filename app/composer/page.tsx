@@ -1,6 +1,7 @@
 "use client"
 
 import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,7 +10,9 @@ import {
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
   Select,
   SelectContent,
@@ -18,10 +21,12 @@ import {
   SelectValue
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
+import { format } from "date-fns";
 import EmojiPicker from 'emoji-picker-react';
-import { ChevronDown, CircleX, ImageIcon, LaughIcon, Paperclip, PaperclipIcon } from "lucide-react";
+import { CalendarIcon, ChevronDown, CircleX, ImageIcon, LaughIcon, Paperclip, PaperclipIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
@@ -56,10 +61,11 @@ const formSchema = z
 axios.defaults.baseURL = process.env.NEXT_PUBLIC_API;
 
 export default function ComposeMessage() {
-  // const [time, setTime] = useState<"now" | "later">("now"); // true - now, false - later
+  const [time, setTime] = useState<"now" | "later">("now");
   const [phoneNumbers, setPhoneNumbers] = useState<string[]>([]);
   const [message, setMessage] = useState("");
   const [files, setFiles] = useState<FileList>();
+  const [sending, setSending] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -73,6 +79,8 @@ export default function ComposeMessage() {
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
+    setSending(true);
+
     const formData = new FormData();
     formData.append("from", values.from);
     formData.append("to", values.to);
@@ -80,9 +88,10 @@ export default function ComposeMessage() {
     formData.append("when", values.when);
 
     if (values.when == "later") {
-      //@ts-ignore
-      formData.append("date", values.date);
-      formData.append("time", values.hour + ":" + values.minute + " " + values.noon);
+      const date = values.date!;
+      date.setHours(+values.hour! + ((values.noon! == "PM") ? 12 : 0));
+      date.setMinutes(+values.minute!);
+      formData.set("time", date.getTime().toString());
     }
 
     const file = files?.[0];
@@ -91,9 +100,9 @@ export default function ComposeMessage() {
     }
 
     axios.post("/api/send-message", formData)
-      .then(() => {
-        toast.success("Message sent successfully");
-      });
+      .then(() => toast.success("Success"))
+      .catch((err) => toast.error(err.response?.data || err.message || "Failed"))
+      .finally(() => setSending(false));
   }
 
   useEffect(() => {
@@ -225,7 +234,7 @@ export default function ComposeMessage() {
             <PopoverContent className="p-0 border-none">
               <EmojiPicker
                 onEmojiClick={(emoji) => {
-                  form.setValue("message", form.getValues().message + emoji.emoji);
+                  form.setValue("message", (form.getValues().message ?? "") + emoji.emoji);
                   form.clearErrors("message");
                 }}
               />
@@ -274,7 +283,7 @@ export default function ComposeMessage() {
             )}
           />
         </div>
-        {/* <div className="mb-20">
+        <div className="mb-20">
           <p className="font-bold mb-10">Choose When to Send</p>
           <FormField
             control={form.control}
@@ -430,7 +439,7 @@ export default function ComposeMessage() {
               </div>
             </div>
           )}
-        </div> */}
+        </div>
         <div className="rounded-2xl border-2 p-5 px-10 flex items-center justify-between bg-gray-100">
           <p className="text-gray-500">
             You will use <span className="text-black font-semibold">{messageCount}</span> messages
@@ -439,7 +448,10 @@ export default function ComposeMessage() {
             <Button className="rounded-full mr-2" variant={"ghost"}>
               <Link href={"/messages"}>Cancel</Link>
             </Button>
-            <Button type="submit" className="rounded-full bg-[#6FD0E2]">SEND</Button>
+            <Button type="submit" className="rounded-full bg-[#6FD0E2]" disabled={sending}>
+              {sending && <LoadingSpinner className="w-4 h-4 mr-1" />}
+              SEND
+            </Button>
           </div>
         </div>
       </form>
