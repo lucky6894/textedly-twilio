@@ -26,11 +26,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import axios from "axios";
 import { format } from "date-fns";
 import EmojiPicker from 'emoji-picker-react';
-import { CalendarIcon, ChevronDown, CircleX, ImageIcon, LaughIcon, Paperclip, PaperclipIcon } from "lucide-react";
+import { CalendarIcon, ChevronDown, CircleX, ImageIcon, LaughIcon, Paperclip, PaperclipIcon, PlusCircleIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useFieldArray, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
 
@@ -39,9 +39,11 @@ const formSchema = z
     from: z.string({
       required_error: "Phone number is required"
     }),
-    to: z.string({
-      required_error: "Please input valid phone number"
-    }).min(5),
+    to: z.array(
+      z.string({
+        required_error: "Please input valid phone number"
+      }).min(5)
+    ).min(1),
     message: z.string().min(1, "Write message"),
     image: z.instanceof(File).optional(),
     file: z.instanceof(File).optional(),
@@ -70,12 +72,18 @@ export default function ComposeMessage() {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      to: "+",
+      to: ["+"],
       when: "now",
       hour: "09",
       minute: "00",
       noon: "AM"
     }
+  });
+
+  const { fields, append } = useFieldArray({
+    //@ts-ignore
+    name: "to",
+    control: form.control,
   });
 
   function onSubmit(values: z.infer<typeof formSchema>) {
@@ -149,18 +157,24 @@ export default function ComposeMessage() {
         <div className="mb-10">
           <p className="font-bold mb-6">Choose Who to Send To</p>
           <p className="text-sm text-gray-500 mb-2">Contacts</p>
-          <FormField
-            control={form.control}
-            name="to"
-            render={({ field }) => (
-              <FormItem>
-                <FormControl>
-                  <Input type="tel" defaultValue={field.value} onChange={field.onChange} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          {fields.map((_, index) => (
+            <FormField
+              control={form.control}
+              name={`to.${index}`}
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Input className="mt-3" type="tel" defaultValue={field.value} onChange={field.onChange} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          ))}
+          <Button className="mt-4" onClick={() => append("+")} variant={'ghost'}>
+            <PlusCircleIcon height={20} />
+            Append
+          </Button>
         </div>
         <div className="relative mb-5">
           <p className="font-bold mb-6">Compose Your Message</p>
