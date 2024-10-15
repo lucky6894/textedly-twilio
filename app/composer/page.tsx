@@ -91,7 +91,7 @@ export default function ComposeMessage() {
 
     const formData = new FormData();
     formData.append("from", values.from);
-    formData.append("to", values.to);
+    formData.append("to", JSON.stringify(values.to));
     formData.append("message", values.message);
     formData.append("when", values.when);
 
@@ -159,6 +159,7 @@ export default function ComposeMessage() {
           <p className="text-sm text-gray-500 mb-2">Contacts</p>
           {fields.map((_, index) => (
             <FormField
+              key={index}
               control={form.control}
               name={`to.${index}`}
               render={({ field }) => (
