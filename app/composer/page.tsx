@@ -10,6 +10,7 @@ import {
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { LoadingSpinner } from "@/components/ui/loading-spinner";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
@@ -22,15 +23,15 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CalendarIcon } from "@radix-ui/react-icons";
 import axios from "axios";
 import { format } from "date-fns";
 import EmojiPicker from 'emoji-picker-react';
-import { ChevronDown, CircleX, ImageIcon, LaughIcon, Paperclip, PaperclipIcon } from "lucide-react";
+import { CalendarIcon, ChevronDown, CircleX, ImageIcon, LaughIcon, Paperclip, PaperclipIcon, PlusCircleIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useFieldArray, useForm } from "react-hook-form";
+import { toast } from "sonner";
 import { z } from "zod";
 
 const formSchema = z
@@ -38,9 +39,11 @@ const formSchema = z
     from: z.string({
       required_error: "Phone number is required"
     }),
-    to: z.string({
-      required_error: "Please input valid phone number"
-    }).min(5),
+    to: z.array(
+      z.string({
+        required_error: "Please input valid phone number"
+      }).min(5)
+    ).min(1),
     message: z.string().min(1, "Write message"),
     image: z.instanceof(File).optional(),
     file: z.instanceof(File).optional(),
@@ -60,16 +63,16 @@ const formSchema = z
 axios.defaults.baseURL = process.env.NEXT_PUBLIC_API;
 
 export default function ComposeMessage() {
-  const [time, setTime] = useState<"now" | "later">("now"); // true - now, false - later
+  const [time, setTime] = useState<"now" | "later">("now");
   const [phoneNumbers, setPhoneNumbers] = useState<string[]>([]);
   const [message, setMessage] = useState("");
   const [files, setFiles] = useState<FileList>();
-  const [previewURL, setPreviewURL] = useState<string>();
+  const [sending, setSending] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      to: "+",
+      to: ["+"],
       when: "now",
       hour: "09",
       minute: "00",
@@ -77,33 +80,55 @@ export default function ComposeMessage() {
     }
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
-  }
+  const { fields, append } = useFieldArray({
+    //@ts-ignore
+    name: "to",
+    control: form.control,
+  });
 
-  function onInvalid(error: any) {
-    console.log(error);
+  function onSubmit(values: z.infer<typeof formSchema>) {
+    setSending(true);
+
+    const formData = new FormData();
+    formData.append("from", values.from);
+    formData.append("to", JSON.stringify(values.to));
+    formData.append("message", values.message);
+    formData.append("when", values.when);
+
+    if (values.when == "later") {
+      const date = values.date!;
+      date.setHours(+values.hour! + ((values.noon! == "PM") ? 12 : 0));
+      date.setMinutes(+values.minute!);
+      formData.set("time", date.getTime().toString());
+    }
+
+    const file = files?.[0];
+    if (file) {
+      formData.append("file", file);
+    }
+
+    axios.post("/api/send-message", formData)
+      .then(() => toast.success("Success"))
+      .catch((err) => toast.error(err.response?.data || err.message || "Failed"))
+      .finally(() => setSending(false));
   }
 
   useEffect(() => {
-    axios.get("/phone-numbers").then(({ data }) => {
+    axios.get("/api/phone-numbers").then(({ data }) => {
       setPhoneNumbers(data);
     });
   }, []);
 
-  useEffect(() => {
+  const messageCount = useMemo(() => Math.ceil(message.length / 160) + 2 * (files?.length || 0), [message, files]);
+  const previewURL = useMemo(() => {
     if (files?.length && files[0].type.startsWith("image/")) {
-      setPreviewURL(URL.createObjectURL(files[0]));
-    } else {
-      setPreviewURL(undefined);
+      return URL.createObjectURL(files[0]);
     }
   }, [files]);
 
-  const messageCount = useMemo(() => Math.ceil(message.length / 160) + 2 * (files?.length || 0), [message, files]);
-
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit, onInvalid)}>
+      <form onSubmit={form.handleSubmit(onSubmit)}>
         <div className="mb-10">
           <p className="font-bold mb-6">Choose What Number to Send From</p>
           <p className="text-sm text-gray-500 mb-2">Select Phone Number</p>
@@ -132,18 +157,25 @@ export default function ComposeMessage() {
         <div className="mb-10">
           <p className="font-bold mb-6">Choose Who to Send To</p>
           <p className="text-sm text-gray-500 mb-2">Contacts</p>
-          <FormField
-            control={form.control}
-            name="to"
-            render={({ field }) => (
-              <FormItem>
-                <FormControl>
-                  <Input type="tel" defaultValue={field.value} onChange={field.onChange} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          {fields.map((_, index) => (
+            <FormField
+              key={index}
+              control={form.control}
+              name={`to.${index}`}
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Input className="mt-3" type="tel" defaultValue={field.value} onChange={field.onChange} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          ))}
+          <Button className="mt-4" onClick={() => append("+")} variant={'ghost'}>
+            <PlusCircleIcon height={20} />
+            Append
+          </Button>
         </div>
         <div className="relative mb-5">
           <p className="font-bold mb-6">Compose Your Message</p>
@@ -177,6 +209,10 @@ export default function ComposeMessage() {
                   <FormControl>
                     <Textarea className="resize-y !border-none !outline-none !shadow-none min-h-16 w-full px-3 pb-1 pt-0"
                       {...field}
+                      onChange={(event) => {
+                        setMessage(event.target.value);
+                        field.onChange(event);
+                      }}
                     />
                   </FormControl>
                   <FormMessage className="absolute -bottom-5" />
@@ -213,7 +249,7 @@ export default function ComposeMessage() {
             <PopoverContent className="p-0 border-none">
               <EmojiPicker
                 onEmojiClick={(emoji) => {
-                  form.setValue("message", form.getValues().message + emoji.emoji);
+                  form.setValue("message", (form.getValues().message ?? "") + emoji.emoji);
                   form.clearErrors("message");
                 }}
               />
@@ -231,7 +267,11 @@ export default function ComposeMessage() {
                 <FormControl>
                   <Input type="file"
                     className="hidden"
-                    onChange={(event) => field.onChange(event.target.files?.[0] ?? undefined)} />
+                    onChange={(event) => {
+                      field.onChange(event.target.files?.[0] ?? undefined);
+                      setFiles(event.target.files ?? undefined);
+                    }}
+                  />
                 </FormControl>
               </FormItem>
             )}
@@ -248,7 +288,11 @@ export default function ComposeMessage() {
                 <FormControl>
                   <Input type="file"
                     className="hidden"
-                    onChange={(event) => field.onChange(event.target.files?.[0] ?? undefined)} />
+                    onChange={(event) => {
+                      field.onChange(event.target.files?.[0] ?? undefined);
+                      setFiles(event.target.files ?? undefined);
+                    }}
+                  />
                 </FormControl>
               </FormItem>
             )}
@@ -419,7 +463,10 @@ export default function ComposeMessage() {
             <Button className="rounded-full mr-2" variant={"ghost"}>
               <Link href={"/messages"}>Cancel</Link>
             </Button>
-            <Button type="submit" className="rounded-full bg-[#6FD0E2]">SEND</Button>
+            <Button type="submit" className="rounded-full bg-[#6FD0E2]" disabled={sending}>
+              {sending && <LoadingSpinner className="w-4 h-4 mr-1" />}
+              SEND
+            </Button>
           </div>
         </div>
       </form>

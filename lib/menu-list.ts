@@ -44,36 +44,36 @@ export function getMenuList(pathname: string): Group[] {
           icon: HouseIcon,
           submenus: []
         },
-        {
-          href: "#",
-          label: "Inbox",
-          active: false,
-          icon: InboxIcon
-        },
-        {
-          href: "#",
-          label: "Channels",
-          active: false,
-          icon: CannabisIcon
-        },
-        {
-          href: "#",
-          label: "Contacts",
-          active: false,
-          icon: ContactIcon
-        },
+        // {
+        //   href: "#",
+        //   label: "Inbox",
+        //   active: false,
+        //   icon: InboxIcon
+        // },
+        // {
+        //   href: "#",
+        //   label: "Channels",
+        //   active: false,
+        //   icon: CannabisIcon
+        // },
+        // {
+        //   href: "#",
+        //   label: "Contacts",
+        //   active: false,
+        //   icon: ContactIcon
+        // },
         {
           href: "/messages",
           label: "Messages",
           active: false,
           icon: MessageCircleIcon
         },
-        {
-          href: "#",
-          label: "Keywords",
-          active: false,
-          icon: KeyIcon
-        },
+        // {
+        //   href: "#",
+        //   label: "Keywords",
+        //   active: false,
+        //   icon: KeyIcon
+        // },
         {
           href: "#",
           label: "Numbers",
@@ -86,24 +86,24 @@ export function getMenuList(pathname: string): Group[] {
           active: false,
           icon: PhoneCallIcon
         },
-        {
-          href: "#",
-          label: "Reviews",
-          active: false,
-          icon: Users2Icon
-        },
-        {
-          href: "#",
-          label: "Payments",
-          active: false,
-          icon: CircleDollarSignIcon
-        },
-        {
-          href: "#",
-          label: "App Store",
-          active: false,
-          icon: LayoutGrid
-        }
+        // {
+        //   href: "#",
+        //   label: "Reviews",
+        //   active: false,
+        //   icon: Users2Icon
+        // },
+        // {
+        //   href: "#",
+        //   label: "Payments",
+        //   active: false,
+        //   icon: CircleDollarSignIcon
+        // },
+        // {
+        //   href: "#",
+        //   label: "App Store",
+        //   active: false,
+        //   icon: LayoutGrid
+        // }
       ]
     },
   ];

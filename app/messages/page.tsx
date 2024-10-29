@@ -1,6 +1,8 @@
 "use client"
 
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 import {
   Table,
   TableBody,
@@ -19,9 +21,11 @@ axios.defaults.baseURL = process.env.NEXT_PUBLIC_API;
 export default function Messages() {
   const [page] = useState(0);
   const [messages, setMessages] = useState<any>([]);
+  const [activeMessage, setActiveMessage] = useState<any>();
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    axios.get("/messages", { params: { page } })
+    axios.get("/api/messages", { params: { page } })
       .then(({ data }) => setMessages(data?.instances));
   }, [page]);
 
@@ -43,8 +47,11 @@ export default function Messages() {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {messages?.map((item: any) => (
-            <TableRow>
+          {messages?.map((item: any, index: number) => (
+            <TableRow key={index} onClick={() => {
+              setActiveMessage(item);
+              setOpen(true);
+            }}>
               <TableCell>{new Date(item.dateSent).toLocaleString()}</TableCell>
               <TableCell>{item.from}</TableCell>
               <TableCell>{item.to}</TableCell>
@@ -53,6 +60,14 @@ export default function Messages() {
           ))}
         </TableBody>
       </Table>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogContent>
+          <DialogTitle>Message</DialogTitle>
+          <Label>From: {activeMessage?.from}</Label>
+          <Label>To: {activeMessage?.to}</Label>
+          <Label>{activeMessage?.body}</Label>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
