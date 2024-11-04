@@ -6,14 +6,14 @@ import { useEffect, useState } from "react";
 axios.defaults.baseURL = process.env.NEXT_PUBLIC_API;
 
 export default function HomePage() {
-  const [statistics, setStatistics] = useState<any>();
+  // const [statistics, setStatistics] = useState<any>();
   const [messages, setMessages] = useState<number>();
 
   useEffect(() => {
     // axios.get("http://localhost/api/statistics").then(({data}) => {
     //   setStatistics(data);
     // });
-    axios.get("http://localhost/api/messages/all").then(({data}) => {
+    axios.get("http://20.47.120.34:801/api/messages/all").then(({data}) => {
       setMessages(data);
     })
   }, []);
