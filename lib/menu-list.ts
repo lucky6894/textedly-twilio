@@ -81,7 +81,7 @@ export function getMenuList(pathname: string): Group[] {
           icon: HashIcon
         },
         {
-          href: "#",
+          href: "/voice-calls",
           label: "Voice Calls",
           active: false,
           icon: PhoneCallIcon
