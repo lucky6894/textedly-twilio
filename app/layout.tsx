@@ -8,8 +8,9 @@ import RootLayout from "@/components/admin-panel/admin-panel-layout";
 import { ThemeProvider } from "@/providers/theme-provider";
 import { useEffect, useRef, useState } from "react";
 import { Device } from "@twilio/voice-sdk";
-import { toast } from "sonner";
 import { MyContext } from './myContext'
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import axios from "axios";
 
 export default function Layout({
@@ -26,7 +27,7 @@ export default function Layout({
     const fetchToken = async () => {
       console.log('get token');
       try {
-        const response = await axios.get('/api/token');
+        const response = await axios.get('http://20.47.120.34:801/api/token');
         console.log(response.data);
         setCallingToken(response.data.token);
 
@@ -63,6 +64,28 @@ export default function Layout({
     };
   }, []);
 
+  const acceptCall = () => {
+    if (activeConnection) {
+      activeConnection.accept();
+      setIncoming(false);
+    }
+  }
+
+  const rejectCall = () => {
+    if (activeConnection) {
+      activeConnection.reject();
+      setIncoming(false);
+      setActiveConnection(null);
+    }
+  }
+
+  const disconnectCall = () => {
+    if (activeConnection) {
+      activeConnection.disconnect();
+      setActiveConnection(null);
+    }
+  }
+
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={GeistSans.className}>
@@ -70,6 +93,21 @@ export default function Layout({
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <RootLayout>
             {children}
+            <Dialog open={incoming || activeConnection} onOpenChange={setIncoming}>
+              <DialogContent>
+                <DialogTitle>Incoming Call</DialogTitle>
+                <div className="flex items-center justify-center gap-10 ">
+                {(activeConnection && !incoming) ? (
+                  <Button onClick={disconnectCall}>Disconnect</Button>
+                ) : (
+                  <>
+                    <Button onClick={acceptCall}>Accept</Button>
+                    <Button onClick={rejectCall}>Reject</Button>
+                  </>
+                )}
+                </div>
+              </DialogContent>
+            </Dialog>
           </RootLayout>
         </ThemeProvider>
         </MyContext.Provider>
