@@ -1,16 +1,16 @@
 import {
-  CannabisIcon,
-  CircleDollarSignIcon,
-  ContactIcon,
+  // CannabisIcon,
+  // CircleDollarSignIcon,
+  // ContactIcon,
   HashIcon,
   HouseIcon,
-  InboxIcon,
-  KeyIcon,
-  LayoutGrid,
+  // InboxIcon,
+  // KeyIcon,
+  // LayoutGrid,
   LucideIcon,
   MessageCircleIcon,
   PhoneCallIcon,
-  Users2Icon
+  // Users2Icon
 } from "lucide-react";
 
 type Submenu = {

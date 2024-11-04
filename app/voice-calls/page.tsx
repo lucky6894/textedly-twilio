@@ -1,6 +1,6 @@
 "use client"
 
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
@@ -26,12 +26,14 @@ export default function Messages() {
   const [page] = useState(0);
   const [calls, setCalls] = useState<any>([]);
   const [isCallOpen, setIsCallOpen] = useState<boolean>(false);
+  const [isCalling, setIsCalling] = useState<boolean>(false);
+  const [callInstance, setCallInstance] = useState<any>(null);
   const [activeMessage, setActiveMessage] = useState<any>();
   const [open, setOpen] = useState(false);
 
   const [phoneNumber, setPhoneNumber] = useState('');
   
-  const { device, callingToken, activeConnection, setActiveConnection, incoming, setIncoming } = useContext(MyContext);
+  const { device, callingToken, setActiveConnection } = useContext(MyContext);
 
   useEffect(() => {
     axios.get("/api/calls/list", { params: { page } })
@@ -48,21 +50,27 @@ export default function Messages() {
 
     try {
       const params = { To: phoneNumber };
-      const callInstance = await device.current.connect({ params });
+      const call = await device.current.connect({ params });
 
-      callInstance.on('accept', () => {
-        toast.success("Call accpeted...")
-        console.log('Call accepted');
+      setCallInstance(call)
+
+      call.on('accept', () => {
+        toast.success("Call accpeted...");
+        console.log("Call accpeted...");
+        setIsCalling(true)
       });
-      callInstance.on('cancel', () => {
+      call.on('cancel', () => {
         toast.info("Call canceled...")
         console.log('Call canceled');
       });
-      callInstance.on('disconnect', () => {
-        console.log({ callInstance });
+      call.on('disconnect', () => {
+        console.log({ call });
         toast.info("Call disconnected...");
         console.log('Call disconnected');
         setActiveConnection(null);
+        setIsCalling(false);  // Reset calling status
+        setCallInstance(null); // Clear the call instance
+        setIsCallOpen(false);
       });
     } catch (error) {
       toast.error(`Error connecting call: ${error}`);
@@ -70,28 +78,35 @@ export default function Messages() {
     }
   };
 
-  const acceptCall = () => {
-    if (activeConnection) {
-      activeConnection.accept();
-      setIncoming(false);
+  const handleDisconnect = () => {
+    if (callInstance) {
+      callInstance.disconnect(); // Disconnect the call
+      setIsCalling(false);       // Update the calling state
+      setCallInstance(null);     // Clear the call instance
     }
-  }
+  };
 
-  const rejectCall = () => {
-    if (activeConnection) {
-      activeConnection.reject();
-      setIncoming(false);
-      setActiveConnection(null);
-    }
-  }
+  // const acceptCall = () => {
+  //   if (activeConnection) {
+  //     activeConnection.accept();
+  //     setIncoming(false);
+  //   }
+  // }
 
-  const disconnectCall = () => {
-    if (activeConnection) {
-      activeConnection.disconnect();
-      setActiveConnection(null);
-    }
-  }
+  // const rejectCall = () => {
+  //   if (activeConnection) {
+  //     activeConnection.reject();
+  //     setIncoming(false);
+  //     setActiveConnection(null);
+  //   }
+  // }
 
+  // const disconnectCall = () => {
+  //   if (activeConnection) {
+  //     activeConnection.disconnect();
+  //     setActiveConnection(null);
+  //   }
+  // }
 
   return (
     <div>
@@ -136,28 +151,13 @@ export default function Messages() {
       </Dialog>
       <Dialog open={isCallOpen} onOpenChange={setIsCallOpen}>
         <DialogContent>
-          <DialogTitle>Let's make a call</DialogTitle>
+          <DialogTitle>Make a call</DialogTitle>
           <div className="flex items-center justify-center gap-5">
           <Label>To:</Label> <Input value={phoneNumber} onChange={(v) => setPhoneNumber(v.target.value)}></Input>
           </div>
           <div className="flex items-center justify-center gap-10 px-10">
-          <Button onClick={handleCall}>Call</Button>
-          {activeConnection && !incoming && <Button onClick={disconnectCall}>Disconnect</Button>}
-          </div>
-        </DialogContent>
-      </Dialog>
-      <Dialog open={incoming || activeConnection} onOpenChange={setIncoming}>
-        <DialogContent>
-          <DialogTitle>Incoming Call</DialogTitle>
-          <div className="flex items-center justify-center gap-10 ">
-          {(activeConnection && !incoming) ? (
-            <Button onClick={disconnectCall}>Disconnect</Button>
-          ) : (
-            <>
-              <Button onClick={acceptCall}>Accept</Button>
-              <Button onClick={rejectCall}>Reject</Button>
-            </>
-          )}
+          { isCalling ? <Button onClick={handleDisconnect}>Disconnect</Button> : <Button onClick={handleCall}>Call</Button> }
+          {/* {activeConnection && !incoming && <Button onClick={disconnectCall}>Disconnect</Button>} */}
           </div>
         </DialogContent>
       </Dialog>
