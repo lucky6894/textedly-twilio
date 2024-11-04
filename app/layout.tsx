@@ -27,7 +27,7 @@ export default function Layout({
     const fetchToken = async () => {
       console.log('get token');
       try {
-        const response = await axios.get('http://20.47.120.34:801/api/token');
+        const response = await axios.get('/api/token');
         console.log(response.data);
         setCallingToken(response.data.token);
 
