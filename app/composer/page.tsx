@@ -91,7 +91,7 @@ export default function ComposeMessage() {
 
     const formData = new FormData();
 
-    let file = files?.[0];
+    const file = files?.[0];
     if (file) {
       formData.append("file", file);
     }
