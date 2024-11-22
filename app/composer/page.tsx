@@ -44,7 +44,7 @@ const formSchema = z
         required_error: "Please input valid phone number"
       }).min(5)
     ).min(1),
-    message: z.string().min(1, "Write message"),
+    message: z.string().optional(),
     image: z.instanceof(File).optional(),
     file: z.instanceof(File).optional(),
     when: z.enum(["now", "later"]),
@@ -90,9 +90,20 @@ export default function ComposeMessage() {
     setSending(true);
 
     const formData = new FormData();
+
+    const file = files?.[0];
+    if (file) {
+      formData.append("file", file);
+    }
+
+    // neither file nor message
+    if (!file && !values.message) {
+      return;
+    }
+
     formData.append("from", values.from);
     formData.append("to", JSON.stringify(values.to));
-    formData.append("message", values.message);
+    formData.append("message", values.message ?? "");
     formData.append("when", values.when);
 
     if (values.when == "later") {
@@ -102,10 +113,7 @@ export default function ComposeMessage() {
       formData.set("time", date.getTime().toString());
     }
 
-    const file = files?.[0];
-    if (file) {
-      formData.append("file", file);
-    }
+    console.log("[send message]");
 
     axios.post("/api/send-message", formData)
       .then(() => toast.success("Success"))

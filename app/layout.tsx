@@ -27,7 +27,7 @@ export default function Layout({
     const fetchToken = async () => {
       console.log('get token');
       try {
-        const response = await axios.get('http://20.47.120.34:801/api/token');
+        const response = await axios.get('/api/token');
         console.log(response.data);
         setCallingToken(response.data.token);
 
@@ -43,7 +43,7 @@ export default function Layout({
           console.error('An error has occurred: ', twilioError);
         });
         device.current.on('incoming', (conn: any) => {
-          console.log('Incoming call...');
+          console.log('Incoming call...', conn);
           setIncoming(true);
           setActiveConnection(conn);
         });
@@ -90,12 +90,12 @@ export default function Layout({
     <html lang="en" suppressHydrationWarning>
       <body className={GeistSans.className}>
         <MyContext.Provider value={{ device, callingToken, activeConnection, setActiveConnection, incoming, setIncoming }}>
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
           <RootLayout>
             {children}
             <Dialog open={incoming || activeConnection} onOpenChange={setIncoming}>
               <DialogContent>
-                <DialogTitle>Incoming Call</DialogTitle>
+                <DialogTitle>Incoming Call From {activeConnection?.parameters.From ?? "???"}</DialogTitle>
                 <div className="flex items-center justify-center gap-10 ">
                 {(activeConnection && !incoming) ? (
                   <Button onClick={disconnectCall}>Disconnect</Button>

@@ -13,7 +13,7 @@ export default function HomePage() {
     // axios.get("http://localhost/api/statistics").then(({data}) => {
     //   setStatistics(data);
     // });
-    axios.get("http://20.47.120.34:801/api/messages/all").then(({data}) => {
+    axios.get("/api/messages/all").then(({data}) => {
       setMessages(data);
     })
   }, []);
