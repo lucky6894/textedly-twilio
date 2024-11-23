@@ -3,8 +3,6 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 
-axios.defaults.baseURL = process.env.NEXT_PUBLIC_API;
-
 export default function Dashboard() {
   // const [statistics, setStatistics] = useState<any>();
   const [messages, setMessages] = useState<number>();

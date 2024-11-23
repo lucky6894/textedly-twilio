@@ -60,8 +60,6 @@ const formSchema = z
     message: "Select date"
   });
 
-axios.defaults.baseURL = process.env.NEXT_PUBLIC_API;
-
 export default function ComposeMessage() {
   const [time, setTime] = useState<"now" | "later">("now");
   const [phoneNumbers, setPhoneNumbers] = useState<string[]>([]);

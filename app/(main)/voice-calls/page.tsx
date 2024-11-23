@@ -20,8 +20,6 @@ import { useEffect, useState } from "react";
 import { useCallContext } from "@/context/CallContext";
 import { toast } from "sonner";
 
-axios.defaults.baseURL = process.env.NEXT_PUBLIC_API;
-
 export default function Messages() {
   const [page] = useState(0);
   const [calls, setCalls] = useState<any>([]);

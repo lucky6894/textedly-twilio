@@ -16,8 +16,6 @@ import { upperFirst } from "lodash";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-axios.defaults.baseURL = process.env.NEXT_PUBLIC_API;
-
 export default function Messages() {
   const [page] = useState(0);
   const [messages, setMessages] = useState<any>([]);

@@ -22,7 +22,7 @@ import { toast } from "sonner";
 import { signin } from "@/lib/utils";
 import { useRouter } from 'next/navigation';
 
-export const userLoginFormSchema = z.object({
+const userLoginFormSchema = z.object({
   emailAddress: z
     .string({ required_error: "Email address is required" }),
   password: z
@@ -31,9 +31,7 @@ export const userLoginFormSchema = z.object({
     .min(8, "Password must have more than 8 characters"),
 });
 
-export type UserLoginFormData = z.infer<typeof userLoginFormSchema>;
-
-axios.defaults.baseURL = process.env.NEXT_PUBLIC_API;
+type UserLoginFormData = z.infer<typeof userLoginFormSchema>;
 
 export default function Login() {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -56,8 +54,8 @@ export default function Login() {
       .catch((err) => {
         console.log(err);
         toast.error("Log in failed");
-      })
-      .finally(() => setIsLoading(false));
+        setIsLoading(false);
+      });
   }
 
   const togglePasswordVisibility = useCallback(() => {
