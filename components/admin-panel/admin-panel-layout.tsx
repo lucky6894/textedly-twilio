@@ -37,7 +37,6 @@ export default function RootLayout({
 
   return (
     <>
-      <Toaster position="top-right" />
       <Sidebar />
       <main
         className={cn(

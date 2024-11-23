@@ -45,8 +45,8 @@ const formSchema = z
       }).min(5)
     ).min(1),
     message: z.string().optional(),
-    image: z.instanceof(File).optional(),
-    file: z.instanceof(File).optional(),
+    image: z.any().optional(),
+    file: z.any().optional(),
     when: z.enum(["now", "later"]),
     date: z.date({
       required_error: "Select date"
