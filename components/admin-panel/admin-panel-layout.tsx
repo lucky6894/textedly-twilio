@@ -6,7 +6,7 @@ import { useStore } from "@/hooks/use-store";
 import { cn } from "@/lib/utils";
 import { useEffect } from "react";
 import { io } from "socket.io-client";
-import { Toaster, toast } from "sonner";
+import { toast } from "sonner";
 import { ContentLayout } from "./content-layout";
 
 const API = process.env.NEXT_PUBLIC_API!;
@@ -24,6 +24,7 @@ export default function RootLayout({
     socket.on("connect", () => console.log("Connected", socket.id));
 
     socket.on("receive-message", (data) => {
+      console.log("[receive-message]");
       const message = JSON.parse(data);
       toast.info(`New message from ${message.From}`);
     });
@@ -37,7 +38,6 @@ export default function RootLayout({
 
   return (
     <>
-      <Toaster position="top-right" />
       <Sidebar />
       <main
         className={cn(

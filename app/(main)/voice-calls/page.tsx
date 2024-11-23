@@ -1,10 +1,9 @@
 "use client"
 
-import { useContext, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
+import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Table,
   TableBody,
@@ -15,12 +14,11 @@ import {
 } from "@/components/ui/table";
 import axios from "axios";
 import { upperFirst } from "lodash";
+import { useEffect, useState } from "react";
 // import Link from "next/link";
 // import { Device } from "@twilio/voice-sdk";
+import { useCallContext } from "@/context/CallContext";
 import { toast } from "sonner";
-import { MyContext } from "../myContext";
-
-axios.defaults.baseURL = process.env.NEXT_PUBLIC_API;
 
 export default function Messages() {
   const [page] = useState(0);
@@ -32,8 +30,8 @@ export default function Messages() {
   const [open, setOpen] = useState(false);
 
   const [phoneNumber, setPhoneNumber] = useState('');
-  
-  const { device, callingToken, setActiveConnection } = useContext(MyContext);
+
+  const { device, callingToken, setActiveConnection } = useCallContext();
 
   useEffect(() => {
     axios.get("/api/calls/list", { params: { page } })
@@ -142,6 +140,7 @@ export default function Messages() {
         </TableBody>
       </Table>
       <Dialog open={open} onOpenChange={setOpen}>
+        <DialogDescription></DialogDescription>
         <DialogContent>
           <DialogTitle>Call Detail</DialogTitle>
           <Label>From: {activeMessage?.from}</Label>
@@ -153,11 +152,11 @@ export default function Messages() {
         <DialogContent>
           <DialogTitle>Make a call</DialogTitle>
           <div className="flex items-center justify-center gap-5">
-          <Label>To:</Label> <Input value={phoneNumber} onChange={(v) => setPhoneNumber(v.target.value)}></Input>
+            <Label>To:</Label> <Input value={phoneNumber} onChange={(v) => setPhoneNumber(v.target.value)}></Input>
           </div>
           <div className="flex items-center justify-center gap-10 px-10">
-          { isCalling ? <Button onClick={handleDisconnect}>Disconnect</Button> : <Button onClick={handleCall}>Call</Button> }
-          {/* {activeConnection && !incoming && <Button onClick={disconnectCall}>Disconnect</Button>} */}
+            {isCalling ? <Button onClick={handleDisconnect}>Disconnect</Button> : <Button onClick={handleCall}>Call</Button>}
+            {/* {activeConnection && !incoming && <Button onClick={disconnectCall}>Disconnect</Button>} */}
           </div>
         </DialogContent>
       </Dialog>

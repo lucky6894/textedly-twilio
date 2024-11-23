@@ -2,7 +2,6 @@ import {
   // CannabisIcon,
   // CircleDollarSignIcon,
   // ContactIcon,
-  HashIcon,
   HouseIcon,
   // InboxIcon,
   // KeyIcon,
@@ -38,9 +37,9 @@ export function getMenuList(pathname: string): Group[] {
       groupLabel: "",
       menus: [
         {
-          href: "/",
+          href: "/dashboard",
           label: "Dashboard",
-          active: pathname == "/",
+          active: pathname == "/dashboard",
           icon: HouseIcon,
           submenus: []
         },
@@ -74,12 +73,6 @@ export function getMenuList(pathname: string): Group[] {
         //   active: false,
         //   icon: KeyIcon
         // },
-        {
-          href: "#",
-          label: "Numbers",
-          active: false,
-          icon: HashIcon
-        },
         {
           href: "/voice-calls",
           label: "Voice Calls",
